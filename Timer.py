@@ -7,9 +7,14 @@ class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon="timer.png")
         
-        self.total_seconds = 25 * 60  
+        self.work_minutes = 25
+        self.break_minutes = 5
+
+        self.total_seconds = self.work_minutes * 60 
         self.remaining = self.total_seconds
         self.is_running = False
+        self.on_break = False
+        self.pomodoro_count = 0
 
         self.timer = rumps.Timer(self.update_timer, 1)
 
@@ -38,8 +43,16 @@ class TimerApp(rumps.App):
         elif self.is_running and self.remaining == 0:
             self.timer.stop()
             self.is_running = False
-            self.title = "✅ TIMER OVER! TAKE A BREAK!"
-            self.show_alert("POMODORO", "✅TIME IS FINISHED, TAKE A WELL DESERVED BREAK!✅")
+
+            if not self.on_break:
+                self.pomodoro_count += 1
+                self.title = "✅ Work done! Take a break!"
+                self.show_alert("Pomodoro", "Work session finished! Time for a break.")
+                self.start_break(self.break_minutes)
+            else:
+                self.title = "✅ Break over! Back to work!"
+                self.show_alert("Pomodoro", "Break finished! Back to work.")
+                self.reset_to_work()
 
     # Tid kontroll
     @rumps.clicked("Start")
@@ -64,6 +77,22 @@ class TimerApp(rumps.App):
         self.remaining = self.total_seconds
         self.title = self.format_time(self.remaining)
 
+    # PAUSE
+    def start_break(self, minutes):
+        self.on_break = True
+        self.total_seconds = minutes * 60
+        self.remaining = self.total_seconds
+        self.is_running = True
+        self.timer.start()
+        self.title = f"🛌 {self.format_time(self.remaining)}"
+
+    def reset_to_work(self):
+        self.on_break = False
+        self.total_seconds = self.work_minutes * 60
+        self.remaining = self.total_seconds
+        self.is_running = False
+        self.title = self.format_time(self.remaining)
+
     # TID MENY
     def set_halfhour(self, _):
         self.set_new_time(30)
@@ -85,9 +114,6 @@ class TimerApp(rumps.App):
     '''
         os.system(command)
 
-
-        
-        
 
 if __name__ == "__main__":
     TimerApp().run()
