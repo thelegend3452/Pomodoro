@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import rumps
+import os
 
 class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon="timer.png")
         
-        self.total_seconds = 25 * 60   
+        self.total_seconds = 10 * 1   
         self.remaining = self.total_seconds
         self.is_running = False
 
@@ -37,9 +38,10 @@ class TimerApp(rumps.App):
         elif self.is_running and self.remaining == 0:
             self.timer.stop()
             self.is_running = False
-            self.title = "✅ Ferdig! Ta en pause!"
+            self.title = "✅ TIMER OVER! TAKE A BREAK!"
+            self.show_alert("POMODORO", "✅TIME IS FINISHED, TAKE A WELL DESERVED BREAK!✅")
 
-    # ===== Tid kontroll
+    # Tid kontroll
     @rumps.clicked("Start")
     def start_timer(self, _):
         if not self.is_running:
@@ -53,6 +55,7 @@ class TimerApp(rumps.App):
         if self.is_running:
             self.timer.stop()
             self.is_running = False
+            
 
     @rumps.clicked("Omstart")
     def reset_timer(self, _):
@@ -61,7 +64,7 @@ class TimerApp(rumps.App):
         self.remaining = self.total_seconds
         self.title = self.format_time(self.remaining)
 
-    # ==== TID MENY ====
+    # TID MENY
     def set_halfhour(self, _):
         self.set_new_time(30)
 
@@ -74,6 +77,17 @@ class TimerApp(rumps.App):
         self.total_seconds = minutes * 60
         self.remaining = self.total_seconds
         self.title = self.format_time(self.remaining)
+
+
+    def show_alert(self, title="⏱ Pomodoro", message="Tiden er ferdig!"):
+        command = f'''
+    osascript -e 'display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'
+    '''
+        os.system(command)
+
+
+        
+        
 
 if __name__ == "__main__":
     TimerApp().run()
