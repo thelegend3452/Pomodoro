@@ -13,15 +13,15 @@ Both are written in **Python** and can be packaged into standalone executables.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### ✅ Prerequisites
+### Prerequisites
 
 * Python 3 (Download from [python.org](https://www.python.org/downloads/))
 
 ---
 
-## 🍏 macOS Instructions
+## macOS Instructions
 
 ### 1. Install Required Library
 
@@ -55,7 +55,7 @@ The `.app` file will be located inside the **dist/** folder.
 
 ---
 
-## 🪟 Windows Instructions
+## Windows Instructions
 
 ### 1. Install Required Library
 
@@ -87,7 +87,7 @@ The `.exe` file will be located inside the **dist/** folder.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 .
@@ -100,7 +100,7 @@ The `.exe` file will be located inside the **dist/** folder.
 
 ---
 
-## ⏳ About Pomodoro Technique
+## About Pomodoro Technique
 
 The **Pomodoro Technique** is a time management method:
 
