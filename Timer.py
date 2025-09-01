@@ -7,7 +7,7 @@ class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon="timer.png")
         
-        self.total_seconds = 10 * 1   
+        self.total_seconds = 25 * 60  
         self.remaining = self.total_seconds
         self.is_running = False
 
