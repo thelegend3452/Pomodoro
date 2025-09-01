@@ -64,7 +64,7 @@ No extra libraries needed — the **Windows version uses tkinter**, which comes 
 ### 2. Run the Script
 
 ```bash
-python pomodoro_timer.py
+python TimerW.py
 ```
 
 This will open the Pomodoro Timer in a **separate application window**.
@@ -80,7 +80,7 @@ pip install pyinstaller
 Then package the app:
 
 ```bash
-pyinstaller --onefile pomodoro_timer.py
+pyinstaller --onefile TimerW.py
 ```
 
 The `.exe` file will be located inside the **dist/** folder.
