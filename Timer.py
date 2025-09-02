@@ -9,23 +9,24 @@ class TimerApp(rumps.App):
 
         
         self.work_minutes = 25
-        self.break_minutes = 5
+        self.break_minutes = 1
 
         self.total_seconds = self.work_minutes * 60 
         self.remaining = self.total_seconds
         self.is_running = False
         self.on_break = False
         self.pomodoro_count = 0
-
         self.timer = rumps.Timer(self.update_timer, 1)
 
         # kontroll meny
         self.menu = [
             "Start",
-            "Stopp",
-            "Omstart",
+            "Stop",
+            "Restart",
+            "Break",
             None,
-            rumps.MenuItem("⏱ Sett varighet", callback=None, dimensions=(200, 25)),
+            rumps.MenuItem("⏱ Choose Timer", callback=None, dimensions=(200, 25)),
+            rumps.MenuItem("25 Minutes", callback=self.set_defaultTime),
             rumps.MenuItem("30 Minutter", callback=self.set_halfhour),
             rumps.MenuItem("60 Minutter", callback=self.set_hour),
         ]
@@ -54,6 +55,7 @@ class TimerApp(rumps.App):
                 self.title = "✅ Break over! Back to work!"
                 self.show_alert("Pomodoro", "Break finished! Back to work.")
                 self.reset_to_work()
+                
 
     # Tid kontroll
     @rumps.clicked("Start")
@@ -91,15 +93,21 @@ class TimerApp(rumps.App):
         self.on_break = False
         self.total_seconds = self.work_minutes * 60
         self.remaining = self.total_seconds
-        self.is_running = False
+        self.is_running = True
+        self.timer.start()
         self.title = self.format_time(self.remaining)
 
     # TID MENY
+    def set_defaultTime(self,_):
+        self.set_new_time(25)
+    
     def set_halfhour(self, _):
         self.set_new_time(30)
 
     def set_hour(self, _):
         self.set_new_time(60)
+        
+    
 
     def set_new_time(self, minutes):
         self.timer.stop()
@@ -107,9 +115,16 @@ class TimerApp(rumps.App):
         self.total_seconds = minutes * 60
         self.remaining = self.total_seconds
         self.title = self.format_time(self.remaining)
+        
+        if minutes <= 25:
+            self.break_minutes = 5
+        elif minutes <= 30:
+            self.break_minutes = 10
+        elif minutes <= 60:
+            self.break_minutes = 15
 
 
-    def show_alert(self, title="⏱ Pomodoro", message="Tiden er ferdig!"):
+    def show_alert(self, title="⏱ Pomodoro", message="GOOD JOB!"):
         command = f'''
     osascript -e 'display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'
     '''
