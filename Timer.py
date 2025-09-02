@@ -9,7 +9,8 @@ class TimerApp(rumps.App):
 
         
         self.work_minutes = 25
-        self.break_minutes = 1
+        self.break_minutes = 5
+        self.sbreak_minutes = 2
 
         self.total_seconds = self.work_minutes * 60 
         self.remaining = self.total_seconds
@@ -66,19 +67,25 @@ class TimerApp(rumps.App):
             self.is_running = True
             self.timer.start()
 
-    @rumps.clicked("Stopp")
+    @rumps.clicked("Stop")
     def stop_timer(self, _):
         if self.is_running:
             self.timer.stop()
             self.is_running = False
             
 
-    @rumps.clicked("Omstart")
+    @rumps.clicked("Restart")
     def reset_timer(self, _):
         self.timer.stop()
         self.is_running = False
         self.remaining = self.total_seconds
         self.title = self.format_time(self.remaining)
+        
+    @rumps.clicked("Break")
+    def break_timer(self, _):
+        self.start_break(self.sbreak_minutes)
+        self.is_running = True
+        self.timer.start()
 
     # PAUSE
     def start_break(self, minutes):
