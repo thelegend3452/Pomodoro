@@ -5,7 +5,8 @@ import os
 
 class TimerApp(rumps.App):
     def __init__(self):
-        super().__init__("⏱ Pomodoro", icon="timer.png")
+        super().__init__("⏱ Pomodoro", icon=("timer.png"))
+
         
         self.work_minutes = 25
         self.break_minutes = 5
