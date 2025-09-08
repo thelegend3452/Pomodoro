@@ -6,13 +6,18 @@ import os
 class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon=("timer.png"))
-
         
-        self.work_minutes = 25
+        self.target_intervals = 0
+        self.long_break = 15
+        self.extra_long_break = 25 
+        self.extra_extra_long_break = 35
+        
+        self.work_minutes = 1
         self.break_minutes = 5
+        self.amount_breaks = 0
         self.sbreak_minutes = 2
-
-        self.total_seconds = self.work_minutes * 60 
+        
+        self.total_seconds = self.work_minutes * 10
         self.remaining = self.total_seconds
         self.is_running = False
         self.on_break = False
@@ -30,6 +35,12 @@ class TimerApp(rumps.App):
             rumps.MenuItem("25 Minutes", callback=self.set_defaultTime),
             rumps.MenuItem("30 Minutter", callback=self.set_halfhour),
             rumps.MenuItem("60 Minutter", callback=self.set_hour),
+            None,
+            rumps.MenuItem("Sessions", callback=None, dimensions=(200, 25)),
+            "2 Intervals",
+            "4 Intervals",
+            "6 Intervals",
+            None,
         ]
 
         self.title = self.format_time(self.remaining)
@@ -43,19 +54,41 @@ class TimerApp(rumps.App):
         if self.is_running and self.remaining > 0:
             self.remaining -= 1
             self.title = self.format_time(self.remaining)
+    
         elif self.is_running and self.remaining == 0:
             self.timer.stop()
             self.is_running = False
-
+    
             if not self.on_break:
                 self.pomodoro_count += 1
-                self.title = "✅ Work done! Take a break!"
-                self.show_alert("Pomodoro", "Work session finished! Time for a break.")
-                self.start_break(self.break_minutes)
-            else:
+    
+                if self.target_intervals > 0 and self.pomodoro_count >= self.target_intervals:
+                    if self.target_intervals == 2:
+                        self.start_break(self.long_break)
+                    elif self.target_intervals == 4:
+                        self.start_break(self.extra_long_break)
+                    elif self.target_intervals == 6:
+                        self.start_break(self.extra_extra_long_break)
+                    self.title = "✅ Long break time!"
+                    self.show_alert("Pomodoro", "Great job! Take a long break.")
+                    
+                        
+                    self.pomodoro_count = 0
+                else:
+                    self.title = "✅ Work done! Take a short break!"
+                    self.show_alert("Pomodoro", "Work session finished! Time for a break.")
+                    self.start_break(self.break_minutes)
+                    
+                
+    
+            else:  
                 self.title = "✅ Break over! Back to work!"
                 self.show_alert("Pomodoro", "Break finished! Back to work.")
                 self.reset_to_work()
+
+
+
+
                 
 
     # Tid kontroll
@@ -84,9 +117,34 @@ class TimerApp(rumps.App):
     @rumps.clicked("Break")
     def break_timer(self, _):
         self.start_break(self.sbreak_minutes)
+       
+        
+    #SESSIONS
+    @rumps.clicked("2 Intervals")
+    def two_intervals(self, _):
+        self.target_intervals = 2
+        self.show_alert("Pomodoro", "2 intervals before a long break.")
+        self.reset_to_work()
         self.is_running = True
         self.timer.start()
-
+    
+    @rumps.clicked("4 Intervals")
+    def four_intervals(self, _):
+        self.target_intervals = 4
+        self.show_alert("Pomodoro", "4 intervals before a long break.")
+        self.reset_to_work()
+        self.is_running = True
+        self.timer.start()
+    
+    @rumps.clicked("6 Intervals")
+    def six_intervals(self, _):
+        self.target_intervals = 6
+        self.show_alert("Pomodoro", "6 intervals before a long break.")
+        self.reset_to_work()
+        self.is_running = True
+        self.timer.start()
+    
+        
     # PAUSE
     def start_break(self, minutes):
         self.on_break = True
@@ -103,6 +161,7 @@ class TimerApp(rumps.App):
         self.is_running = True
         self.timer.start()
         self.title = self.format_time(self.remaining)
+    
 
     # TID MENY
     def set_defaultTime(self,_):
@@ -129,6 +188,7 @@ class TimerApp(rumps.App):
             self.break_minutes = 10
         elif minutes <= 60:
             self.break_minutes = 15
+            
 
 
     def show_alert(self, title="⏱ Pomodoro", message="GOOD JOB!"):
