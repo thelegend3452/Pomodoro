@@ -48,7 +48,10 @@ pip install pyinstaller
 Then package the app:
 
 ```bash
-pyinstaller -w --icon=timer.png Timer.py
+pyinstaller --windowed --onefile \
+    --add-data "timer.png:." \
+    --icon=timer.icns \
+    Timer.py
 ```
 
 The `.app` file will be located inside the **dist/** folder.
