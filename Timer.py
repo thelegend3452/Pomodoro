@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Created on Tue Sep  9 11:10:23 2025
+
+@author: asmaarabid
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import rumps
 import os
 
 class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon=("timer.png"))
+        self.status_item = rumps.MenuItem("Status:", callback=None)
         
         self.target_intervals = 0
         self.long_break = 15
         self.extra_long_break = 25 
         self.extra_extra_long_break = 35
         
-        self.work_minutes = 1
+        self.work_minutes = 25
         self.break_minutes = 5
         self.amount_breaks = 0
         self.sbreak_minutes = 2
         
-        self.total_seconds = self.work_minutes * 10
+        self.total_seconds = self.work_minutes * 60
         self.remaining = self.total_seconds
         self.is_running = False
         self.on_break = False
@@ -26,6 +35,8 @@ class TimerApp(rumps.App):
 
         # kontroll meny
         self.menu = [
+            self.status_item,
+            None,
             "Start",
             "Stop",
             "Restart",
@@ -84,7 +95,7 @@ class TimerApp(rumps.App):
             else:  
                 self.title = "✅ Break over! Back to work!"
                 self.show_alert("Pomodoro", "Break finished! Back to work.")
-                self.reset_to_work()
+                self.resume_work()
 
 
 
@@ -99,12 +110,14 @@ class TimerApp(rumps.App):
                 self.reset_timer(None)
             self.is_running = True
             self.timer.start()
+            self.status_item.title = "Status: work"
 
     @rumps.clicked("Stop")
     def stop_timer(self, _):
         if self.is_running:
             self.timer.stop()
             self.is_running = False
+            self.status_item.title = "Status: Timer stopped"
             
 
     @rumps.clicked("Restart")
@@ -116,7 +129,9 @@ class TimerApp(rumps.App):
         
     @rumps.clicked("Break")
     def break_timer(self, _):
+        self.saved_break = self.remaining
         self.start_break(self.sbreak_minutes)
+        
        
         
     #SESSIONS
@@ -127,6 +142,10 @@ class TimerApp(rumps.App):
         self.reset_to_work()
         self.is_running = True
         self.timer.start()
+        self.status_item.title = "Status: 2 intervals"
+        
+
+
     
     @rumps.clicked("4 Intervals")
     def four_intervals(self, _):
@@ -135,6 +154,7 @@ class TimerApp(rumps.App):
         self.reset_to_work()
         self.is_running = True
         self.timer.start()
+
     
     @rumps.clicked("6 Intervals")
     def six_intervals(self, _):
@@ -153,6 +173,7 @@ class TimerApp(rumps.App):
         self.is_running = True
         self.timer.start()
         self.title = f"🛌 {self.format_time(self.remaining)}"
+        self.status_item.title = "Status: Break"
 
     def reset_to_work(self):
         self.on_break = False
@@ -161,6 +182,16 @@ class TimerApp(rumps.App):
         self.is_running = True
         self.timer.start()
         self.title = self.format_time(self.remaining)
+        self.status_item.title = "Status: Work"
+        
+    def resume_work(self):
+        self.on_break = False
+        self.total_seconds = self.work_minutes * 60
+        self.remaining = getattr(self, "saved_break")
+        self.is_running = True
+        self.timer.start()
+        self.title = self.format_time(self.remaining)
+        self.status_item.title = "Status: Work"
     
 
     # TID MENY
@@ -193,9 +224,10 @@ class TimerApp(rumps.App):
 
     def show_alert(self, title="⏱ Pomodoro", message="GOOD JOB!"):
         command = f'''
-    osascript -e 'display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'
+    osascript -e 'display notification "{message}" with title "{title}"'
     '''
         os.system(command)
+
 
 
 if __name__ == "__main__":
