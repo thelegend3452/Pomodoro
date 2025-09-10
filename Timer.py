@@ -95,7 +95,7 @@ class TimerApp(rumps.App):
             else:  
                 self.title = "✅ Break over! Back to work!"
                 self.show_alert("Pomodoro", "Break finished! Back to work.")
-                self.resume_work()
+                self.reset_to_work()
 
 
 
