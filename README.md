@@ -56,6 +56,10 @@ pyinstaller --windowed --onefile \
 
 The `.app` file will be located inside the **dist/** folder.
 
+An easier way to get this app on your mac is through this link:
+```bash
+https://study-application.netlify.app/
+```
 ---
 
 ## Windows Instructions
