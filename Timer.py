@@ -15,6 +15,7 @@ class TimerApp(rumps.App):
     def __init__(self):
         super().__init__("⏱ Pomodoro", icon=("timer.png"))
         self.status_item = rumps.MenuItem("Status:", callback=None)
+        self.manual_break = False
         
         self.target_intervals = 0
         self.long_break = 15
@@ -75,6 +76,7 @@ class TimerApp(rumps.App):
     
                 if self.target_intervals > 0 and self.pomodoro_count >= self.target_intervals:
                     if self.target_intervals == 2:
+                        self.manual_break = False
                         self.start_break(self.long_break)
                     elif self.target_intervals == 4:
                         self.start_break(self.extra_long_break)
@@ -82,6 +84,7 @@ class TimerApp(rumps.App):
                         self.start_break(self.extra_extra_long_break)
                     self.title = "✅ Long break time!"
                     self.show_alert("Pomodoro", "Great job! Take a long break.")
+                    
                     
                         
                     self.pomodoro_count = 0
@@ -95,7 +98,11 @@ class TimerApp(rumps.App):
             else:  
                 self.title = "✅ Break over! Back to work!"
                 self.show_alert("Pomodoro", "Break finished! Back to work.")
-                self.reset_to_work()
+                if self.manual_break:
+                    self.resume_work()
+                else:
+                    self.reset_to_work()
+                
 
 
 
@@ -131,6 +138,8 @@ class TimerApp(rumps.App):
     def break_timer(self, _):
         self.saved_break = self.remaining
         self.start_break(self.sbreak_minutes)
+        self.manual_break = True
+        
         
        
         
@@ -174,6 +183,7 @@ class TimerApp(rumps.App):
         self.timer.start()
         self.title = f"🛌 {self.format_time(self.remaining)}"
         self.status_item.title = "Status: Break"
+        
 
     def reset_to_work(self):
         self.on_break = False
@@ -186,8 +196,10 @@ class TimerApp(rumps.App):
         
     def resume_work(self):
         self.on_break = False
-        self.total_seconds = self.work_minutes * 60
-        self.remaining = getattr(self, "saved_break")
+        if hasattr(self, "saved_break"):
+            self.remaining = self.saved_break
+        else:
+            self.remaining = self.work_minutes * 60
         self.is_running = True
         self.timer.start()
         self.title = self.format_time(self.remaining)
